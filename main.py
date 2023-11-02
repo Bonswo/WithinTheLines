@@ -190,7 +190,16 @@ class Game:
         self.display.blit(score_text, (Game.display_size[0]/2 - w/2, 
                                        Game.display_size[1]/2 - h/2))
 
-        # bounding_box_points = get_polyline_points(self.bounding_box.start, self.bounding_box.end, self.bounding_box.width)
+        
+        
+        pygame.draw.circle(self.display,
+                           ORANGE,
+                           self.bounding_box.start,
+                           self.bounding_box.width/2)
+        bounding_box_points = get_polyline_points(self.bounding_box.start, self.bounding_box.end, self.bounding_box.width)
+        pygame.draw.polygon(self.display, 
+                            ORANGE,
+                            bounding_box_points)
         #dist from end
         x0, y0 = self.bounding_box.start
         x1, y1 = self.bounding_box.end
@@ -198,18 +207,34 @@ class Game:
         percent_progressed = self.timer / self.current_time_limit
         x2 = percent_progressed * (x1-x0) + x0
         y2 = percent_progressed * (y1-y0) + y0
-        pygame.draw.line(self.display, 
-                         ORANGE, 
-                         self.bounding_box.start, self.bounding_box.end,
-                         width=self.bounding_box.width)
-        pygame.draw.line(self.display, 
-                         LIGHT_RED, 
-                         (x2, y2), self.bounding_box.end,
-                         width=self.bounding_box.width)
+        bounding_box_points = get_polyline_points((x2,y2), self.bounding_box.end, self.bounding_box.width)
+        pygame.draw.polygon(self.display, 
+                            LIGHT_RED,
+                            bounding_box_points)
+        
+        
+        pygame.draw.circle(self.display,
+                           LIGHT_RED,
+                           (x2,y2),
+                           self.bounding_box.width/2)
+        pygame.draw.circle(self.display,
+                           SEPIA,
+                           self.bounding_box.end,
+                           self.bounding_box.width/2+10)
         pygame.draw.circle(self.display,
                            LIGHT_RED,
                            self.bounding_box.end,
                            self.bounding_box.width/2)
+        pygame.draw.circle(self.display,
+                           BLUE_BLACK,
+                           self.bounding_box.end,
+                           self.bounding_box.width/2+10,
+                           width=5)
+        # pygame.draw.line(self.display, 
+        #                  ORANGE, 
+        #                  self.bounding_box.start, self.bounding_box.end,
+        #                  width=self.bounding_box.width)
+                
         
 
 
@@ -363,19 +388,15 @@ class ParticleManager():
 def get_polyline_points(start, end, width):
     x0, y0 = start
     x1, y1 = end
-    if x1 - x0 == 0:
-        m0 = 9999
-    elif y1-y0 == 0:
-        m0 = 0.000000001
-    else:
-        m0 = y1-y0 / x1-x0
+    if y1 == y0:
+        y1 += 0.0000001
 
-    rad_angle = math.atan(-1/m0)
-    p1 = (x0 + math.cos(rad_angle) * width/2, y0 - math.sin(rad_angle) * width/2)
-    p2 = (x0 - math.cos(rad_angle) * width/2, y0 + math.sin(rad_angle) * width/2)
+    rad_angle = math.atan(-(x1-x0)/(y1-y0))
+    p1 = (x0 - math.cos(rad_angle) * width/2, y0 - math.sin(rad_angle) * width/2)
+    p2 = (x0 + math.cos(rad_angle) * width/2, y0 + math.sin(rad_angle) * width/2)
     
-    p3 = (x1 + math.cos(rad_angle) * width/2, y1 - math.sin(rad_angle) * width/2)
-    p4 = (x1 - math.cos(rad_angle) * width/2, y1 + math.sin(rad_angle) * width/2)
+    p3 = (x1 + math.cos(rad_angle) * width/2, y1 + math.sin(rad_angle) * width/2)
+    p4 = (x1 - math.cos(rad_angle) * width/2, y1 - math.sin(rad_angle) * width/2)
     return (p1, p2, p3, p4)
 
 
